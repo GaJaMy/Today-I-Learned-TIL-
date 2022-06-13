@@ -1,7 +1,7 @@
 # Today I Learned(TIL)
 1. 프레임 워크 및 여러가지 설치 방법 정리
     * VScode 설치 및 Extention 정리
-    * [JvaScript 디버깅 방법][../Today-I-Learned-TIL-/VSCode/JavaScrptDebuggin.md]
+    * [JvaScript 디버깅 방법](../Today-I-Learned-TIL-/VSCode/JavaScrptDebuggin.md)
 2. 기초 HTML,CSS,JavaScript
     * HTML
     * CSS
