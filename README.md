@@ -5,7 +5,7 @@
 2. 기초 HTML,CSS,JavaScript
     * HTML
     * CSS
-    * JavaScript
+    * [JavaScript](./%EA%B8%B0%EC%B4%88%20HTML%2CCSS%2CJavaScript/JavaScript/JavaScript.md)
 3. Java
 4. MFC
 5. C#
@@ -15,3 +15,8 @@
     * 컴퓨터 구조
     * 네트워크 및 통신
     * 운영 체제
+
+***
+* 기록 내역 
+    - 2022년 6월 13일 ->  최초 작성 및 자바 스크립트 기본 [Truthy & Falsy](./%EA%B8%B0%EC%B4%88%20HTML%2CCSS%2CJavaScript/JavaScript/JavaScript.md) 까지 공부
+    - 2022년 6월 14일 ->  
