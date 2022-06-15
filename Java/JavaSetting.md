@@ -3,9 +3,11 @@
     - [JetBrains 홈페이지 접속](https://www.jetbrains.com/ko-kr/idea/)해서 다운로드
 2. 설치 프로그램 실행
     + Next클릭 
+    
     ![Alt text](./Images/JavaSetting/IntelliJ%20Install1.PNG)
     ---
     + 설치할 폴더 경로 선택 후 Next 클릭
+
     ![Alt text](./Images/JavaSetting/IntelliJ%20Install2.PNG)
     ---
     + 옵션 선택 
