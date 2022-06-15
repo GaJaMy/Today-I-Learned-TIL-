@@ -1,4 +1,4 @@
-# 자바 설치 및 환경 설정(Windows)
+# 자바 설치(Windows)
 1. IntelliJ 설치
     - [JetBrains 홈페이지 접속](https://www.jetbrains.com/ko-kr/idea/)해서 다운로드
     ---
@@ -22,5 +22,22 @@
     + Install 시작
 
         ![Alt text](./Images/JavaSetting/IntelliJ%20Install4.PNG)
+---
+
+# IntelliJ 프로젝트 만들기
+1. 프로젝트 생성
+    + IntelliJ에서 Projects 탭 클릭 -> New Project 클릭
+
+        ![Alt text](./Images/JavaSetting/Project%20Create1.PNG)
+   --- 
+    + 프로젝트 명, 프로젝트 위치, 언어, 빌드 시스탬, SDK 설정 후 Create
+        - 만약, SDK가 없다면 원하는 것을 찾아서 바로 다운로드
+
+        ![Alt text](./Images//JavaSetting/Project%20Create2.PNG)
     
-    
+---
+# 기타
+1. font 크기 변경 방법
+    - File -> Settings -> Editor -> Font
+2. keymap(단축키) 변경 방법
+    - File -> Settings -> Keymap
