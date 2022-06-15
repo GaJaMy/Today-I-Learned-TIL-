@@ -7,6 +7,8 @@
     * CSS
     * [JavaScript](./%EA%B8%B0%EC%B4%88%20HTML%2CCSS%2CJavaScript/JavaScript/JavaScript.md)
 3. Java
+    * [자바 설치 및 환경 설정](./Java/JavaSetting.md)
+    * [자바 기초](./Java/Java.md)
 4. MFC
 5. C#
 6. Computer Science
@@ -19,4 +21,5 @@
 ***
 * 기록 내역 
     - 2022년 6월 13일 ->  최초 작성 및 자바 스크립트 기본 [Truthy & Falsy](./%EA%B8%B0%EC%B4%88%20HTML%2CCSS%2CJavaScript/JavaScript/JavaScript.md) 까지 공부
-    - 2022년 6월 14일 ->  
+    - 2022년 6월 14일 ->  자바스크립트 함수 까지 공부
+    - 2022년 6월 15일 ->  자바스크립트 기초 끝, 자바 시작

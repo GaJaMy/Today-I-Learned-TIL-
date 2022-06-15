@@ -126,4 +126,145 @@
                 return 'func'
             }
         ```
-    + 매개변수와 
+    + arguments 객체
+        - 가변 인자를 넘길때 사용한다.
+        - arguments 객체는  배열이 아니다.
+        - 화살표 함수에서는 사용 불가능 하다.
+    + rest parameter
+        - arguments 객체와 비슷하지만 같지는 않다.
+        - 역시 가변인자를 넘길 때 사용한다.
+        - 화살표 함수에서도 사용가능
+        - 배열이다.
+        ```JavaScript
+            //arguments 객체와는 다르게 화살표 함수에서도 사용가능하며
+            //배열처럼 다룰 수 있다
+            const func = (...nums) => {
+                return nums.reduce((prev,curr) => prev + curr);
+            }
+
+            console.log(func(1,2,3,4,5,6,7)); // 28
+        ```
+***
+13. DOM
+    + HTML을 객체로 모델링 하는 것
+    + JavaScript언어의 일부가 아님 JavaScript로 HTML을 조작하는것
+        - JavaScript에서 문서 자체를 조작하기 위해 모델링 한것을 DOM
+    + 여러 조작법은 mdn을 찾아보면서 하다가 익숙해질 수 있도록 한다.
+***
+14. 이벤트
+    + HTML에서 발생한 어떤 행동을 의미 한다. ex) 마우스 클릭
+    + 이벤트 다루는 방법
+    ```JavaScript
+        //reset이라는 클래스 이름을 가진 dom 객체를 가져온다.
+        const resetButton = document.querySelector('.reset');
+        
+        //이벤트 리스너('이벤트 타입',이벤트 발생시 실행할 함수)
+        resetButton.addEventListener('click', function () {
+            alert('안녕하세요');
+        });
+    ```
+    + 이벤트 객체
+        - 해당하는 이벤트를 DOM 객체로 접근 한다.
+    ```JavaScript
+        //reset이라는 클래스 이름을 가진 dom 객체를 가져온다.
+        const resetButton = document.querySelector('.reset');
+        
+        //이벤트 자체가 발생시 무조건 넘겨준다.
+        //마우스의 위치와 같은 것을 알고 싶을 때 event 객체에 접근해서 사용 가능
+        resetButton.addEventListener('click', function (evnet) {
+            alert('안녕하세요');
+        });
+    ```
+    + 이벤트 핸들러
+        - 이벤트를 다루는 메소드 또는 객체 ex)addEventListener메소드
+***
+15. 객체
+    + 객체 생성
+        - 싱글 리터럴 방식
+        ```JavaScript
+            const boject ={
+                property : 'value',
+                method: function () {},
+            }
+        ```
+        - 생성자 함수 방식, 일반적인 객체를 많이 또는 자주 사용할때 사용
+        ```JavaScript
+            // 객체 정의
+            function NewObejct(name){
+                this.name = name;
+            }
+            //객체 생성
+            const newObject = new NewObject('Seo');
+        ```
+        - 메소드 사용 방식, Object.create 메소드 사용
+        ```JavaScript
+            const newObject2 = Object.create(
+                Object.prototype,
+                {
+                    name:{
+                        value: 'seo'
+                        writable: true, //덮어 쓸수 있는지
+                        enumerable: true, //열거할 수 있는지
+                        configuralbe: true, // 객체 서술자를 수정할 수 있는지
+                    },
+                },
+            );
+        ```
+    + 프로퍼티 열거
+        - forin문을 사용하여 열거한다.
+        ```JavaScript
+            const obj = {
+                prop1 = 'value1',
+                prop2 = 'value2',
+                prop3 = 'value3',
+                prop4 = 'value4',
+            };
+            
+            //for문에서는 const 사용하는게 좋다.
+            for(const key in obj){
+                //그 자신만의 프로퍼티를 가져 올수 있도록 한다.
+                //즉, 상속이 된 프로퍼티는 가져오지 않는다.
+                if(obj.hasOwnProperty(key))
+                {
+                    console.log(obj[key]);
+                }
+            }
+        ```
+    + 프로퍼티 조작
+        ```JavaScript
+            const person{
+                firstName: 'seo',
+                location: 'korea',
+            };
+
+            //추가
+            person.lastName = 'hd';
+            //수정
+            person.lastName = 'hyungdong';
+            //삭제
+            delete person.location;
+        ```
+    + 프로퍼티 접근자
+        - getter,setter 안전하게 객체의 프로퍼티에 접근하기 위한 접근자
+        ```JavaScript
+            const person{
+                _firstName: 'seo',
+                location: 'korea',
+                
+                //해당 프로퍼티를 가져온다.
+                get firstName(){
+                    return this._firstName;
+                }
+
+                //해당 프로퍼티를 파라미터로 받아온 것으로 바꿔준다.
+                set fristName(newFirstName){
+                    if(tyoeif newFirstName === 'string'){
+                        this._firstName = newFirstName;                
+                    }
+                    else 
+                        return;
+                }
+            };
+        ```
+    + 인스턴스
+        - 클래스나 프로토타입을 사용하여 만들어 낸 것, 실제 고유한 객체
