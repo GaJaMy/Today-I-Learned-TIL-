@@ -378,7 +378,7 @@
     + 스트림 중개연산
         - Filtering - filter 내부 조건에 참인 요소들을 추출
         ```Java
-            IntStream intStream = intStream.range(1,10).fukter(n->n%2 == 0);
+            IntStream intStream = intStream.range(1,10).filter(n->n%2 == 0);
         ```
         - Mapping - map 안의 연산을 요소별로 수행
         ```Java
