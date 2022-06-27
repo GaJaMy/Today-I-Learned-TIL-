@@ -18,7 +18,7 @@
             String country = "Korea";
         ```
     + 대부분의 자료형은 C++와 비슷함 아래는 처음보는 것 정리, 각 자료형에 대한 메소드는 구글링 참조 할 것
-        - StringBuffer - 문자열을 자주 추가하거나 변경할때 사용하는 자료형
+        - StringBuffer - <span style="color:#2D3748;background-color:#fff5b1">문자열을 자주 추가하거나 변경할때</span> 사용하는 자료형
         ```Java
             StringBuffer sb1 = new StringBuffer("HelloWorld");
             sb1.append("!!!");  //sb1 -> "HelloWorld!!!"
@@ -75,7 +75,7 @@
 ***
 5. 조건문,반복문
     + 기본 반복문 조건문은 C++과 같음
-    + for each문
+    + for each문 - 모든 원소 순회 할때 편리함
     ```Java
         int[] nums = {1,2,3,4,5};
         for(int val : nums) {
@@ -258,6 +258,10 @@
         InputStreamReader reader;
         BufferedReader br;
         Scanner sc; //이 방식을 자주 사용
+        //Scanner 이용 방법
+        Scanner sc = new Scanner(System.in);
+        char test = sc.nextLine().charAt(0);
+        String test2 = sc.nextLine();
     ```
     + 콘솔 출력 - 입출력 방식 중 콘솔 출력 방법 , 입력과 마찬가지
     ```Java
