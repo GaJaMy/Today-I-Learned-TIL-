@@ -397,3 +397,25 @@
             IntStream.range(1,5).min().getAsInt(); // 최소값
             IntStream.range(1,5).max().getAsInt(); // 최대값
         ```
+***
+# 추가 공부 내용들
++ Scanner 사용시 주의사항
+```Java
+    Scanner sc = new Scanner(System.in);
+    int a = sc.nextInt();
+    int b = sc.nextInt();
+    //위와 같이하면 버퍼가 안비워져서 이상하게 들어감
+    //sc.nextLine()으로 버퍼 지워서 사용
+    
+    //반드시 sc 클로즈 해줘야함
+    sc.close();
+```
++ Random 클래스
+    - 난수를 생성하는 클래스로 객체를 생성하여 사용
+```Java
+    Random random = new Random();
+    boolean b = random.nextBoolean() // true 또는 false
+    int num = random.nextInt() // 정수로 표현할수 있는 값 모든 범위에서 난수 생성
+    int num2 = random.nextInt(10) // 2.323232323(0~9)사이의 값 
+
+```
