@@ -30,7 +30,66 @@
             - 데이터 추가, 삭제 시 앞뒤 데이터의 연결을 재구성하는 작업 필요
         + 연결 리스트 기본 구조
             - 노드 - 데이터 저장 단위로, 값과 포인터(다음 노드나 이전 노드의 연결 정보)로 구성
-        
+            - 데이터 추가 - 마지막에 추가 될 때
+                1. 추가할 데이터를 담을 노드 생성
+                2. 링크 연결 작업
+                3. head 이전 작업
+            - 데이터 추가 - 중간에 추가 될 때
+                1. 추가할 데이터를 담을 노드 생성
+                2. head로 부터 데이터 추가 위치 직전 노드까지 순회
+                3. 링크 연결 작업
+            - 데이터 삭제 - 가장 앞의 데이터 삭제 시
+                1. 삭제 대상 노드 지정(delete_node)
+                2. head 이전 작업
+                3. delete_node 삭제 -> 그냥 head를 바꿔주면 된다.
+            - 데이터 삭제 - 중간 데이터 삭제 시
+                1. head로 부터 삭제 대상 노드까지 순회 및 해당 노드 지정(delete_node)
+                2. 삭제 대상 이전/이후 노드의 링크 연결 작업
+                3. delete_node 삭제 -> 그냥 head를 바꿔주면 된다.
+            - 리스트의 종류
+                - 단순 연결 리스트 - 각 노드가 단순히 다음 노드만을 가리키고 있으며, 헤드 하나만 있다.
+                ```Java
+                    class Node{
+                        int data;
+                        Node next;
+                    }
+                    class LinkedList {
+                        Node head;
+                    }
+                ```
+                - 양방향 연결 리스트 - 각 노드가 prev와 next로 이전 노드와 다음 노드를 가리키며, head와 tail 이라는 리스트의 양쪽 끝을 가리키고 있다.
+                ```Java
+                    class Node{
+                        int data;
+                        Node prev;
+                        Node next;
+                    }
+                    class DoubleLinkedList {
+                        Node head;
+                        Noda tail;
+                    }
+                ```
+                - 원형 연결 리스트 - 모양 자체는 양방향 연결 리스트와 같으나, head가 다시 tail을 가리키고 tail이 다시 head를 가리킨다.
+                ```Java
+                    class Node{
+                        int data;
+                        Node prev;
+                        Node next;
+                    }
+                    class CircularLinkedList {
+                        Node head;
+                        Noda tail;
+
+                        CircularLinkedList(Node node){
+                            this.head = node;
+                            this.tail = node;
+                            node.next = this.head;
+                            node.prev = this.tail;
+                            // 하나만 있을 경우 다시 자기 자신을 가리키며 순환한다.
+                        }
+                    }
+                ```
+
 
 
 
