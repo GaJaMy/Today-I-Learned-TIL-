@@ -89,7 +89,60 @@
                         }
                     }
                 ```
+    + 스택(Stack) - 후입선출(Last In First Out : LIFO), 마지막에 들어온 데이터가 먼저 나가는 구조, 데이터가 입력된 순서의 역순으로 처리되어야 할 때 사용
+        ```Java
+            //스텍의 생성
+            Stack stack = new Stack();
 
+            //push - 뒤에 삽입
+            stack.push(1); // 1
+            stack.push(2); // 1 2
 
+            //pop - 뒤에 있는 데이터를 꺼냄
+            stack.pop() // 1
+            
+            //peek - 가장 마지막에 있는 데이터를 리턴하지만 데이터를 꺼내진 않음
+            stack.peek() // 1
 
+            //contain - 해당 데이터가 있는지 검색
+            stack.contains(1) // true;
 
+            //size - 스텍의 크기 출력
+            stack.size(); // 1 
+        ```
+    + 큐(queue) - 선입선출(First In First Out : FIFO), 먼저 들어온 데이터가 먼저 나가는 구조, 입력 순서대로 데이터 처리가 필요할 때 사용
+        - 데이터 추가(Enqueue)
+        - 데이터 꺼내기(Dequeue)
+        ```Java
+            // Queue는 인터페이스로 되어있어서 new를 사용해 바로 사용 할 수 없다. 왜냐하면 다 오버라이딩 해줘야 하기 때문
+            Queue queue = new LinkedList();
+
+            //큐에 삽입
+            queue.add(1);
+            queue.add(2);
+            queue.add(3);
+            queue.add(4);
+            queue.add(5);
+            System.out.println(queue);              //1,2,3,4,5
+
+            //Dequeue
+            System.out.println(queue.poll());       //1    
+            System.out.println(queue);              //2,3,4,5
+
+            System.out.println(queue.poll());       //2
+            System.out.println(queue);              //3,4,5
+
+            //꺼내진 않고 리턴만 해줌
+            System.out.println(queue.peek());       //3
+            System.out.println(queue);              //3,4,5
+
+            //데이터 검색
+            System.out.println(queue.contains(3));  //true
+            //큐 크기
+            System.out.println(queue.size());       //3
+            //큐가 비었는지 검사
+            System.out.println(queue.isEmpty());    //false
+
+            //큐 비우기
+            queue.clear();                          //
+        ```
