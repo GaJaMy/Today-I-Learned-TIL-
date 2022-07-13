@@ -55,3 +55,24 @@
             - 클래스 - String,Date,Random 등(대부분 클래스)
             - 인터페이스 - Runnable, Enumeration
             - 참조한다는건 원래 저장 공간의 메모리 주소를 저장 한다는 의미
+***
+# 자바 언어 여러가지 사용법 정리
+1. HashSet
+```Java
+    //HashSet 선언
+    HashSet hash1 = new HashSet();
+    HashSet hash2 = new HashSet();
+
+    //HashSet 선언 및 데이터 할당
+    HashSet a = new HashSet(Arrays.asList(1,2,3,4,5));
+    HashSet b = new HashSet(Arrays.asList(2,4,6,7,10));
+
+    //동시 존재 데이터만 남기기
+    a.retainAll(b); // a : 2,4
+
+    //두 해쉬 합치기
+    a.addAll(b); // a : 1,2,3,4,5,6,7,10
+
+    //동시 존제 데이터 삭제
+    a.removeAll(b) // a : 1,3,5
+```
