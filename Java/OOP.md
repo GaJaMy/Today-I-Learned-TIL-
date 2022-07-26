@@ -195,5 +195,38 @@
         - 상위 클래스형을 하위 클래스 형으로 변환
         - 다운 캐스팅은 반드시 명시적 형변환 연산자 (하위 클래스)가 필요
         - 만일 형변환 연산자가 없으면 컴파일 시간에 오류 발생
-
-        
+***
+13. 추상클래스와 인터페이스 다시 듣기!
+***
+14. Java 클래스 및 라이브러리 활용
+    + java.lang 패키지
+        - 자바 프로그램의 가장 기본이 되는 클래스들을 포함
+        - import문 없이 사용
+        - 대표적인 String, System 클래스를 import문 없이 사용할 수 있었던 이유
+    + Object 클래스
+        - 모든 클래스의 조상 클래스 -> 따라서 Object 클래스의 멤버들은 상송이 가능하다면 다른 클래스에서 사용가능
+            - 메소드
+                - clone - 객체 자신의 복사본을 리턴
+                - equals - 객체 자신과 같은 객체인지를 리턴
+                - finalize - 소멸될 때 실행
+                - getClass - 객체 자신의 클래스 정보를 담고 있는 Class인스턴스 반환
+                - hashCode - 해시코드를 반환
+                - toString - 문자열 리턴
+                - notify - 객체 자신을 사용하려고 기다리는 쓰레드를 하나만 깨운다.
+                - notifyAll - 객체 자신을 사용하려고 기다리는 모든 쓰레드를 깨운다.
+***
+15. String 클래스
+    + String Class
+        - 자바에서 문자열을 처리하는 클래스
+        - 메서드
+            - length
+            - charAt
+            - toCahrArray
+            - contains
+            - indexOf
+            - lastIndexOf
+            - toLowerCase
+            - toUpperCase
+            - trim
+            - equals 등등 오지게 많음으로 필요할 때마다 검색
+                
