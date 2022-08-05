@@ -266,3 +266,76 @@
     ```Java
 
     ```
+***
+20. 컬렉션
+    + 자바에서 자료 구조를 구현한 클레스
+    + 자료 구조란 자료를 저장하기 위한 구조
+    + 대부분의 프로그램은 자료를 저장하기 때문에 필요에 따라서 적절한 자료 구조를 사용할 지를 결정
+        - 전화 번호를 저장
+        - 시간표를 저장
+    + 자료구조의 종류 : 리스트, 스텍, 큐, 집합, 해시 테이블 등
+    + Vector 클래스
+        - 벡터 클래스는 Java에서 가장 오래된 자료구조 구현 클래스
+        - 배열의 경우, 크기가 고정되어 있기 때문에 사용이 불편함
+        - Vector는 가변 크기의 배열을 구현
+        - 요소의 개수가 늘어나면 자동으로 배열의 크기가 늘어남
+        - 어떤 타입의 객체도 저장
+        ```Java
+            Vector vector = new Vector();
+
+            //벡터 삽입
+            vector.add("홍길동");
+            vector.add(1);
+            vector.add(25);
+            vector.add("동");
+
+            //백터의 원소 접근
+            vector.get(0);
+            vector.get(1);
+            vector.get(2);
+            vector.get(3);
+
+            //벡터의 원소 순회
+            for(Object x: vector) {
+                System.out.println(x);
+            }
+        ```
+    + Set 클래스
+        - HashSet : 키값만 중복 안되는 Set
+        - LinkedHashSet : 넣는 순서되로 Set
+        - TreeSet : 정렬된 Set
+        ```Java
+            HashSet<String> hashSet = new HashSet<String>();
+            LinkedHashSet<String> linkedHashSet = new LinkedHashSet<>();
+            TreeSet<String> treeSet = new TreeSet<>();
+
+            hashSet.add("4");
+            hashSet.add("2");
+            hashSet.add("3");
+            hashSet.add("1");
+            hashSet.add("4");
+            
+            Iterator<String> hashSetIterator = hashset.iterator();
+            while(hashSetIterator.hasNext()){
+                System.out.println(hashSetIterator.next())
+            }
+            hashSet.add("4");
+        ```
+    + Map 클래스 - Set과는 다르게 키와 값을 가짐
+        - HashMap: 그냥 키값만 중복 안되게
+        - LinkedHashMap : 넣는 순서 대로
+        - TreeMap : 정렬
+        ```java
+            HashMap<String, Object> hashMap = new HashMap<>();
+            LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
+            TreeMap<String, String> treeMap = new TreeMap();
+
+            hashMap.put("B","B-Value");
+            hashMap.put("A","A-Value");
+            hashMap.put("D","D-Value");
+            hashMap.put("C","C-Value");
+            hashMap.put("B","B-Value");
+        ```
+    + 리스트
+        - ArrayList:순차적인 추가 삭제는 빠르지만, 중간에 있는 데이터를 추가, 삭제하는 경우에는 LinkedList에 비해 상식적으로 느림, 추가 삭제를 반복할 경우 메모리 사용잉 비효율 적
+        - LinkedList:데이터를 처리하는데 있어서 개수가 계속해서 변하는 경우는 LinkedList를 사용하고 그 이외에는 대부분 ArrayList를

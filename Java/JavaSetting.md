@@ -41,3 +41,5 @@
     - File -> Settings -> Editor -> Font
 2. keymap(단축키) 변경 방법
     - File -> Settings -> Keymap
+3. 자바 한글 깨짐 시
+    - 자바 JDK를 최신 보다 한단계 아래 버전으로 바꾼다.

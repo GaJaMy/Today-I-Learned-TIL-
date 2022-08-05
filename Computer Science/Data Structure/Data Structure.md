@@ -415,7 +415,7 @@
             System.out.println(Arrays.toString(pq.toArray()));
 
             // 우선순위: 높은 숫자 순
-            PriorityQueue<Integer> pq2 = new PriorityQueue<>(Collections.reverseOrder   ());
+            PriorityQueue<Integer> pq2 = new PriorityQueue<>(Collections.reverseOrder());
             pq2.add(5);
             pq2.add(7);
             pq2.add(3);
@@ -423,3 +423,12 @@
             pq2.add(9);
             System.out.println(Arrays.toString(pq2.toArray()));
         ```
+    + 트라이(Trie)
+        - 문자열을 저장하고 빠르게 탐색하기 위한 트리 형태의 자료구조
+        - 정렬된 트리 구조
+        - 문자열 저장을 위한 메모리가 필요하지만 탐색이 빠름
+            - 길이가 N인 문자열 탐색의 시간 복잡도 :O(N)
+        - 문자열 구성 - 각 문자들을 공통된것을 기첨으로 트리형태로 구성됨
+        - key, Value로 이루어진 노드로 구성
+            - key:알파벳
+            - Value:자식노드
