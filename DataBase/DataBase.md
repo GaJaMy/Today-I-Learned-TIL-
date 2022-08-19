@@ -44,3 +44,96 @@
         - 하나의 테이블은 행과 열로 구성
             - 열 : 필드, 속성이라고도 
             - 행 : 튜플, 레코드
+5. 데이터베이스 인스턴스
+    + 데이터 베이스 보기 
+    ```sql
+        show databases;
+    ```
+    + 생성/삭제
+        - DBMS랑도 대화하기 위해서는 언어가 필요
+        - 이 언어를 SQL 이라고함
+        - 목적: DBMS의 데이터를 관리하기 위해서 설계된 특수 목적의 프로그래밍 언어
+        - SQL 명령어
+            - 데이터 정의어 - 테이블과 인덱스 구조를 관리
+            - 데이터 조작어 - 데이터를 조작
+            - 데이터 제어어 - 권한을 주는 등의 데이터를 제어
+        - 생성/삭제
+            - CREATE DATABASE{데이터 베이스 인스턴스 명};
+            - DROP DATABASE{데이터 베이스 인스턴스 명};
+        ```sql
+            //생성
+            create database db1;
+            //삭제
+            drop database db1;
+        ```
+    + 계정 생성
+        - CREATE USER '생성할 계정 명'@'도메인(localhost,%)' IDENTIFIED BY '패스워드'
+            - localhost는 외부에서 접속을 막는다.
+    + 계정 권한 설정
+        - GRANT ALL PRIVILEGES ON 권한을 주고 싶은 DB.* TO '계정명'@'도메인' IDENTIFIED BY '패스워드'
+6. 테이블
+    + 데이터는 관계형 데이터 베이스의 기본 단위인 테이블 형태로 저장
+    + 모든 자료는 테이블에 등록되고, 테이블로부터 원하는 자료를 꺼내옴
+    + 테이블은 어느 특정한 주제와 목적으로 만들어지는 일종의 집합
+    + 새로운 데이터를 입력할 때, 새로운 테이블을 생성할 필요 없이 데이터만 추가하면 됨
+    + 데이터 자료형
+        - 숫자 데이터
+        - 문자열 데이터
+        - boolean 데이터
+        - 날짜/시간 데이터
+        - 큰 객체 데이터
+    + 테이블 생성
+    ```sql
+        create 테이블 명(
+            속성1,
+            속성2,
+            속성3,
+            ...
+        );
+    ```
+7. CRUD
+    + 컴퓨터 소프트웨어가 가진 기본적인 데이터 처리 기능
+        - Crete - 생성 -> insert
+        - Read - 읽기 -> select
+        - Update - 갱신 -> update
+        - Delete - 삭제 -> delete
+8. 데이터 처리
+    + INSERT - 데이터 추가
+        ```sql
+            insert into 테이블명(컬럼1,컬럼2,...)values(값1,값2,값3..);
+        ```
+        - 하나의 레코드(튜플, 행)을 구분할 수 있어야 함
+        - PK(primary key) : 주 식별자 키로 테이블의 모든 데이터를 식별하는 컬럼
+        - 특징: 중복 불가, null 불가
+        - FK(foreign key) : 외부 식별자 키로 테이블 간의 종속 관계
+        ```sql
+            --프라이머리 키 설정--
+            --alter : 테이블의 내용을 수정하는 명령어--
+            alter table 테이블 명
+            add constraint primary key pk_zerobase_memer (컬럼);
+
+            --프라이머리 키 해제--
+            alter table 테이블명
+            drop primary key;
+        ```
+    + UPDATE - 갱신
+        ```sql
+            update 테이블 명
+            set
+                컬럼1 = 값1,
+                컬럼2 = 값2,
+                ....
+            where 조건;            
+        ```
+    + DELETE - 데이터 삭제
+        ```sql
+            delete
+            from 테이블명
+            where 조건;
+        ```
+    + SELECT - 데이터 조회
+        ```sql
+            select 출력 대상 컬럼명1, 출력 대상 컬럼명2...
+            from 출력 대상 컬럼들이 있는 테이블 명
+            where 조건;
+        ```
