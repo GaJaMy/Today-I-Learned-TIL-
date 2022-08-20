@@ -137,3 +137,144 @@
             from 출력 대상 컬럼들이 있는 테이블 명
             where 조건;
         ```
+9. alias와 *(에스터리스크)
+    + 일종의 별명이라고 생각하면 됨
+        - 테이블에 대한 별명 : 테이블명 바로 뒤에 옴
+        - 컬럼에 대한 별명 : 컬럼 바로 뒤에 옴
+        - as키워드를 이용해서 사용(옵션사항)
+    ```sql
+        select 테이블 별명.컬럼 as 컬럼 별명1,
+            테이블 별명.컬럼 as 컬럼 별명2
+            ...
+        from 테이블 명 as 테이블 별명;
+    ```
+    + *는 모든 컬럼을 말함
+10. JOIN
+    + 여러 테이블을 함께 조회하기
+        - 2개 이상의 태이블을 연결해 데이터를 출력하는 것
+        - 일반적으로 사용되는 sql문장의 상단수가 조인을 이용
+        - join은 관계형 데이터 베이스의 가장 큰 장점이면서 핵심 기능
+        - 일반적인 경우 행들은 PK나 FK값의 연관에 의해 조인이 성립(하지만, 특별한 경우에는 PK나 FK의 관계가 없어도 논리적인 값들의 연관만으로 조인 가능)
+        - JOIN은 2개의 테이블을 JOIN하지만, 여러개의 테이블이 있더라도 JOIN이 가능함(먼저 특정 2개의 테이블만 JOIN처리하고, 그 결과 집합을 다시 나머지 테이블과 JOIN. 다만, 이 때 JOIN 순서는 내부적으로 DBMS 옵티마이저가 결정)
+        ```sql
+            -- inner join --
+            select m.member_type,m.user_id,m.password,m.name,
+                    md.mobile_no,md.marketing_yn,md.register_date
+            from member as m
+                join member_detail as md
+                    on m.member_type = md.member_type and m.user_id = md.user_id
+            ;
+
+            -- left join --
+            select m.member_type,m.user_id,m.password,m.name,
+                   md.mobile_no,md.marketing_yn,md.register_date
+            from member as m
+                left join member_detail as md
+                    on m.member_type = md.member_type and m.user_id = md.user_id
+            ;
+
+            -- right join --
+            select m.member_type,m.user_id,m.password,m.name,
+                   md.mobile_no,md.marketing_yn,md.register_date
+            from member as m
+                right join member_detail as md
+                    on m.member_type = md.member_type and m.user_id = md.user_id
+            ;
+
+            -- full join --
+            select m.member_type,m.user_id,m.password,m.name,
+                   md.mobile_no,md.marketing_yn,md.register_date
+            from member m
+                join member_detail md;
+        ```
+11. CASE~END 문 -> 자바에서 if문과 같다.
+    ```sql
+        case 컬럼
+            when 조건1 then 값1
+            when 조건2 then 값2
+            else 값3
+        end
+    ```
+
+12. DBMS 내장 함수 -> 검색해서 사용할 것
+    + 벤더에서 기본적으로 제공하는 내장 함수
+    + 대부분의 데이터베이스에서 제공하는 함수들
+    + 단일행 함수 : 함수의 입력값이 단일행 값이 입력
+    + 다중행 함수 : 함수의 입력값이 여러행 값이 입력 -> 집계 함수, 그룹 함수 등...
+
+    + 문자형 함수 : 문자를 입력하면 문자난 숫자 값을 반환
+    + 숫자형 함수 : 숫자를 입력하면 숫자 값을 반환
+    + 날짜형 함수 : date 타입의 값을 연산
+    + 변환형 함수 : 문자, 숫자, 날짜형 값의 데이터 타입을 변환
+    + NULL 관련 함수 : NULL을 처리하기 위한 함수
+    ```sql
+        --문자열 관련--
+        concat(문자열1,문자열2) --문자열 합치기 문자열1문자열2--
+        substring(컬럼명,1,2 )  --문자열 자르기 컬럼명에 있는 데이터를 1번 위치에서 2개만큼 자른다--
+        length(password) --문자열 크기 출력--
+
+        --날짜 관련--
+        date_format(컬럼명,포멧(검색)) --날짜 -> 문자열--
+        str_to_date(문자열,포멧(검색)) --문자열 -> 날짜--
+        date_add(날짜,interval 1 주기) --날짜 더하기--
+    ```
+
+13. 페이징 처리
+    + 데이터는 엄청 많아 한번에 모두 보는데 한계가 있음
+    + 특정 위치부터 특정 개수까지 내려줌
+    + mysql,mariadb의 경우 limit를 이용하여 페이징 처리 가능
+    + oracle의 경우 rownum을 이용해서 페이징 처리가능
+    + mssql의 경우 offset,fetch를 이용해서 처리(2012이후)
+
+14. VIEW 테이블
+    + 실질적으로 존재하는 테이블이 아니라 정의만 가지고 있음
+    + 가상 READ ONLY 테이블
+    + 사용에 있어서, 테이블과 동일 (단, SELECT에서만)
+    + 장점
+        - 독립성 : 테이블 구조가 변경되어도 뷰를 사용하는 응용프로그램은 변경하지 않아도 된다.
+        - 편리성 : 복잡한 쿼리를 뷰로 생성함으로써 관련 질의를 단순하게 작성할 수 있음
+        - 보안성 : 권한에 따로 표시하지 않아야 하는 컬럼의 경우 숨길 수 있음
+    ```sql
+        --뷰 생성--
+        create view 뷰테이블 명 as 
+            쿼리 작성
+        ;
+
+        --뷰 삭제--
+        drop view 뷰테이블 명;
+    ```
+
+15. 함수
+    + DBMS에서 제공되는 공통적 함수 이외에 사용자가 직접 정의하고 작성
+    + SQL을 활용하여 일련의 로직을 수행하고, 수행 결과를 단일 값으로 반환할 수 있는 모듈
+    + 그냥 복잡하고 반복적인 내용의 쿼리를 간단히 하여 사용
+    ```sql
+        create function 함수명(파라미터)
+            returns 반환할 데이터 타입
+        begin
+            수행할 쿼리
+            return 반환할 값
+        end;
+    ```
+
+16. 프로시저
+    + 여러개의 sql문을 같이 실행
+    + 데이터 베이스에 대한 일련의 작업을 정리한 절차를 관계형 데이터베이스 관리 시스템에 저장한 것으로 영구저장모듈 이라고도 불림
+    + 함수와 비슷하나 다름 [프로시저와 함수의 차이] (https://fomaios.tistory.com/entry/Oracle-%ED%95%A8%EC%88%98Function%EC%99%80-%ED%94%84%EB%A1%9C%EC%8B%9C%EC%A0%80Procedure-%EC%B0%A8%EC%9D%B4)
+    ```sql
+        create procedure 프로시저명(파라미터)  -- 함수와는 다르게 파라미터에 입력--
+        begin                                 -- 이 여러게 입력 출력 입출력이 옴--
+            쿼리문
+        end; 
+    ```
+
+    + delimiter 
+        - 문법의 끝을 나타내는 역할을 함
+        - 콘솔 작업을 할 때 ; 을 만나면 문장이 끝났다고 인식 하기 때문에 다시 문장의 시작과 끝을 나타내기 위해 사용
+        ```sql
+            delimiter $$
+                프로시저
+            delimiter; 
+        ```
+
+17. 트리거
