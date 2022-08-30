@@ -76,4 +76,213 @@
             - D(224~239.255.255.255)
             - E(240~255.255.255.255)
         - PC의 IP 주소 : 127.0.0.1(DNS로는 localhost)
-        
+***
+5. TCP 프로토콜
+    + TCP헤더와 data로 구성
+    + TCP헤더
+        - Source Port - 송신자의 Port 번호
+        - Destination Port - 수신자의 Port 번호
+        - Sequence Number - 송신된 데이터의 순서
+        - Ack number - 수신된 데이터 순서번호 + 1(그러니까 다음 데이터 달라는 의미)
+        - Code Bits
+            - URG - 긴급 데이터
+            - ACK - Ack Number용 데이터임을 표시
+            - PSH - 수신측 버퍼가 다 찰때까지 기다리지 않고, 바로 전달 요청
+            - RST - 접속 리셋 요청시 사용
+            - SYN - 연결 요청시 사용
+            - FIN - 연결 종료시 사용
+        - Checksum - 데이터 무결성 검사
+    + 3-way 핸드쉐이크 : TCP 통신을 위한 연결 설정 과정
+        1. SYN bit를 1로 설정 후 서버에 전달(데이터가 맞는 지 확인 하기 위해 Sequence Number에 임의의 숫자를 넣어서 보냄)
+        2. 서버는 위의 패킷을 받은 후 Sequence Number에 받은 숫자 + 1을 Ack Number에 넣어서 ACK bit와 SYN bit를 1로 하여 보냄(역시나 데이터가 맞는 지 확인 하기 위해 Sequeence Number에 임의의 숫자를 넣어서 보냄)
+        3. 클라이언트가 2의 패킷을 받고 Ack Number에 받은 숫자 + 1을 담아서 ACK bit를 1로 하고 SYN bit는 0으로 보내면 연결 설정 완료
+    + 4-way 핸드쉐이크 : TCP 통신을 위한 연결 해제 과정
+        1. FIN bit를 1로 설정 후 서버에 전달
+        2. 서버가 ACK bit 1로만들고 클라이언트에 보낸다. 다만 바로 끊는게 아니라 서버 내에서 작업이 필요할 수도 있기 때문에 응답만 보낸다.
+        3. 서버가 작업이 끝나면 FIN bit를 1로 하고 클라이언트에 보낸다.
+        4. 클라이언트가 서버와 연결이 끊는 작업을 하고 난 뒤 ACK bit를 1로하고 서버에 보낸다.
+        - *최근에는 FIN과 ACK bit 둘다 보낸다. 아래는 최근 과정
+        1. FIN,ACK bit를 1로 하고 임의의 Sequence Number를 보낸다.
+        2. 서버가 ACK bit를 1로 하고 1에서 받은 숫자 + 1(Ack Number)을 클라이언트에 보내 종료 가능 응답을 보낸다.
+        3. 서버가 작업이 끝나면 FIN,ACK bit를 1로 하고 1,2의 과정과는 다른 임의의 Sequence Number와 2에서 보낸 Ack number를 보낸다.
+        4. 클라이언트가 ACK bit를 1로 하고 3과정에서의 Ack Number를 Sequence Number에 넣고, 3과정에서의 Sequence Number를 Ack Number에 +1을 한뒤 보내고 연결을 해제한다.
+    + TCP 전송
+        - Sequence Number 
+            - 일정 단위로 데이터를 분할해서 전송
+            - 송신측에서 수신측에 데이터가 몇 번째 데이터인지를 알려줌
+        - Ack number
+            - 다음 번호의 데이터를 알려줌 (어디까지 수신했는지 확인 가능)
+        1. 클라이언트가 금번 패킷의 첫 번째 데이터 번호 + 데이터 길이를 Sequence number에 넣고 서버에 보냄
+        2. 서버가 클라이언트에 Ack Number에 위 Sequence Number를 넣어서 보냄
+        3. 클라이언트는 1번의 과정을 다시 함
+    + TCP 제어
+        + 흐름 제어 - 서로 다른 스팩의 PC 끼리 통신을 하는 경우 수신 측에서 데이터를 해독하는 과정이 오래걸려 송신측에서 보낸 데이터가 유실 되는 경우가 발생 그걸 해결 하기 위해 데이터의 크기를 제어하는 등의 작업을 흐름 제어
+        + 혼잡 제어 - 굉장히 먼 거리의 PC 끼리 통신을 하는 경우 중간에 어떤 라우터 또는 망의 일부분이 굉장히 많은 작업을 하게 되어 데이터가 유실 되는 경우가 발생 이걸 해결하기 위해 그런 망을 회피하거나 데이터의 크기를 조절하는 방법으로 혼잡을 제어
+        + 흐름 제어 - 슬라이딩 윈도우
+            - 매번 ACK를 기다리지 않고, 여러 패킷을 연속해서 송신하기 위해, 각 컴퓨터의 윈도우 사이즈를 확인하고, 윈도우 사이즈 만큼 ACK 없이 연속해서 송신
+            - Stop and Wait(기존 데이터 송수신 과정)
+                1. 클라이언트가 1번 데이터 보냄
+                2. 서버가 1번데이터 수신완료 응답 보냄
+                3. 위과정 반복
+                - 위의 과정은 너무 비효율적(1GB를 보내야되는데 1Byte 씩 보내야 하는 상황이라면 한참 기다린 뒤에야 전체 데이터가 수신되어 다음을 보낼 수 있기 때문)
+            - Sliding Window(위의 단점을 해결한 방법)
+                1. 초기(연결 설정 단계에서)에 송수신자간 최대로 송수신할 수 있는 크기를 보내 둘중 작은거를 선택하여 슬라이딩 윈도우 크기로 정함(여기서 크기는 패킷의 갯수)
+                2. 송신자가 윈도우 크기 만큼 보냄
+                3. 수신자는 받은 크기 만큼의 데이터를 읽기 시작하여 읽은 패킷을 응답으로 보내기 시작
+                4. 송신자가 응답이 온 패킷이 있으면 윈도우가 이동하고 해당 윈도우 안에 보내지 않은 패킷이 있으면 한번에 보냄
+            - 현대에는 또 방식이 바뀜
+                - 송수신측 모두 윈도우 사이즈를 65535로 설정
+                - 연결 단계에서 송수신자간 RTT(SYN/ACK 시간)을 측정하여 이를 기반으로 윈도우 사이즈를 재설정
+        + 혼잡 제어 - Congestion Window
+            - 송신 제어를 위한 윈도우는 2개
+                - Receiver Window : 흐름 제어에서 활용
+                - Congestion Window : 네트워크 혼잡 제어를 위해 사용
+            - 송신측 최종 윈도우 크기는 위의 두개의 윈도우 중 최소
+            - AIMD(Additive increase/Multicative Decrease)
+                - 처음에는 CWND =1 
+                - ACK가 도착하면 (패킷 전송 성공시) -> CWND = CWND + 1
+                - ACK가 일정 시간동안 도착하지 않음 (패킷 전송 실패) -> CWND = CWND / 2
+            - Slow Start
+                - 일반적으로 처음에는 CWND = 1
+                - ACK가 도착하면(패킷 전송 성공시) -> CWND = CWND + 2
+                - ACK가 일정 시간동안 도착하지 않음(패킷 전송 실패) -> CWND = 1
+            - 혼잡 회피(Congestion Avoiance)
+                - CWND가 일정 크기에 도달하면, ACK 도착시 (패킷 전송 성공시) -> CWND + 1
+***
+6. UDP
+    + 사용자 데이터그램 프로토콜
+    + UDP와 TCP 비교
+        - TCP는 연결 설정, 연결 해제, 혼잡제어, 데이터 송수신 확인의 과정이 있지만, UDP는 없음
+        - UDP는 데이터 효율성 중시
+            - 일반적으로 TCP보다 빠룰 수 있음
+        - UDP 헤더도 단순
+            - Soruce Port - 송신자 포트
+            - Destination Port - 수신자 포트
+            - Data Length - 데이터 크기
+            - Checksum - 무결성 체크
+    + UDP의 장점
+        - 동영상 스트리밍등의 서비스에서 많이 사용됨
+            - 데이터 유실이 일부 있어도 문제 없고, 빠른 전송이 필요한 서비스
+        - TCP와 달리 브로드캐스팅 지원
+            - 브로드캐스팅: 동일 네트워크에 연결된 모든 컴퓨터에 데이터 송신 가능
+***
+7. HTTP 프로토콜과 WWW 구성요소
+    + WWW란
+        - W3 또는 웹(Wep)
+        - 주요 요소 : HTML,URL,HTTP
+        - HTML을 일거 URL 주소를 가진 곳과 HTTP 프로토콜이용
+    + HTTP
+        - Server/Client 모델로 Request / Response 사용
+            - Client에서 요청(Request)을 보내면, Server에서 응답(Response)을 준다.
+            - HTTP는 Connectionless한 프로토콜임 - 1회성 Request 및 Response!
+            - TCP/IP socket을 이용해서 연결됨
+    + HTTP 1.1
+        - keepalive 기능을 통해, 서버에서 설정된 keepalive timeout까지는 연결과정 없이 데이터 송수신 가능
+            - 내부적으로 결국 매번 TCP 3-way handshake 과정을 거칠 필요가 없어짐
+    + HTTP Request / Response
+        - Request
+            - 구조
+            - HTTP Request-Line
+                - HTTP Method Path HTTP 버전
+            - HTTP Request-Header 
+                - 정보
+            - HTTP Request-Body
+                - 추가정보
+        - Response
+            - 구조
+            - HTTP Response-Line
+                - HTTP 버전 Status Code Status Message
+            - HTTP Response-Header 
+                - 정보
+            - HTTP Response-Body
+                - 추가정보
+    + 주요 HTTP Request Method
+        - GET - 정보읽기(Select)
+            - 전달이 필요한 파라미터들은 URL을 통해 전달
+            - 웹사이트 접속시는 일반적으로 GET을 통해 HTML을 가져옴
+        - POST - 정보 입력하기(INSERT)
+            - 전달이 필요한 파라미터들은 HTTP body에 포함되어 전달되므로, 사용자는 직접적인 확인 불가
+        - PUT - 정보 수정하기(UPDATE)
+        - DELETE - 정보 삭제하기(DELETE)
+    + Response Status Code
+        - 200 : 정상
+        - 400 : 유효하지 않은 파라미터 또는 잘못된 요청
+        - 401 : 승인되지 않은 엑세스
+        - 403 : 엑세스 금지
+        - 404 : 리소스를 찾을 수 없음
+        - 500 : 내부 서버 오류
+    + 쿠키(Cookie)와 세션(Session)
+        - HTTP는 Stateless: 통신이 끝나면 상태를 유지하지 않음
+        - 이를 보완하기 위한 기법이 쿠키와 세션
+        - 쿠키
+            - 웹 브라우저 내에 응답 받은 패킷에 있는 Header 정보를 저장 해놓고 재활용 함
+            - 즉, 로그인 상태가 유지될 수 있음
+            - 보안적으로 위험
+        - 세션
+            - 쿠키와 같지만 보안 문제 해결
+            - 헤더 데이터를 암호화 함
+            - 즉, 서버에만 데이터가 보관되어 헤커가 네트워크에서 까본다고 해도 알 수 없음
+        - 쿠키 / 세션 유효기간
+            - expires 설정이 있으면, 로컬 디스크에 저장 및 유효기간 경과시 삭제
+            - expires 설정이 없으면, 메모리에 저장 및 브라우저 종료시 삭제
+    + URL(Uniform Resource Locator)
+        - 인터넷 상의 자원 위치 표기를 위한 규약
+        - WWW 주요 요소 중 하나
+        - URL과 URI
+            - URI - 통합 자원 식별자, 특정 자원을 지칭
+***
+8. HTTPS
+    - HTTP 통신시 사용하는 TCP/IP 소켓 통신에서, 일반 텍스트 대신, SSL 또는 TLS 프로토콜을 통해 데이터 암호화하여 송수신
+    - HTTPS 기본 포트는 443
+    - http:// 대신 https:// 로 시작
+***
+9. 네트워크 보안
+    + 대칭키(비밀키)
+        - 암/복호화키가 동일
+        - 대표 암호화 알고리즘 : DES,3DES,TDES,AES,SEED,ARIA등
+    + 비대칭키(공개키,개인키)
+        - 암/복호화 키가 상이
+        - 대표 암호화 알고리즘 : RSA,ECC등
+***
+10. REST
+    + REST(Representational State Transfer)
+        - 자원(resource)의 표현(representation)에 의한 상태 전달
+        - HTTP URI를 통해 자원을 명시하고, HTTP Method를 통해 자원에 대한 CRUD Operation 적용
+            - CRUD Operation과 HTTP Methd
+                - Create: 생성(POST)
+                - Read: 조회(GET)
+                - Update: 수정(PUT)
+                - Delete: 삭제(DELETE)
+    + REST API
+        - REST 기반으로 서비스 API를 구현한 것
+        - 마이크로 서비스, Open API(누구나 사용하도록 공개된 API) 등에서 많이 사용됨
+***
+11. 주요 응용계층 프로토콜
+    + DNS - 도메인 이름을 IP 주소로 변환, 또는 그 반대를 수행하기 위해 개발
+        - 전세계 흩어진 DNS 서버를 통해, 도메인 이름:IP 주소 정보 확인 가능
+        - DNS는 Network Protocol로 UDP 사용
+        - DNS 서버에 모든 도메인에 대한 IP가 등록 되어 있고, 그것을 찾아 반환 
+    + 메일 서버(SMTP와 POP3 프로토콜)
+        - SMTP - 메일 송신
+            - MIME
+                - SMTP 프로토콜은 텍스트만 전송가능
+                - SMTP 본문 내용에 MIME 헤더와 함께, 다양한 포멧의 데이터를 ASCII 코드로 변환해서 전송
+                - 클라이언트에서 SMTP 본문데이터를 MIME 헤더를 확인해서 디코딩 하면 됨
+        - POP3 - 메일 수신
+            - POP3와 IMAP
+                - IMAP(143 포트): 중앙 서버에서 메일 동기화
+                    - 모든 장치에서 동일한 이메일 폴더 확인 가능
+                    - 중앙 서버 메일 용량에 따라, 메일 수신 불가 가능
+                - POP3(110 포트): 중앙 서버에서 로컬 장치로 이메일을 내려 받음
+                    - 내려받은 이메일은 중앙 서버에서 지우는 것이 디폴트 동작
+***
+12. FTP와 웹브라우저 동작
+    + FTP - 서버와 클라이언트 사이의 파일 전달을 위한 프로토콜
+        - 일반 서비스와 달리 2개 포트 사용
+            - 21번 : 접속/제어를 위한 포트
+            - 보통 20번 : 데이터 전송을 위한 포트
+    + 웹브라우저 동작과정
+        1. 웹브라우저에 입력된 URL은 DNS 프로토콜을 사용, IP 주소로 변환
+        2. HTTP Request는 운영체제 네트워크 스택을 따라 HTTP -> TCP -> Ethernet을 전기 신호로 변환, 전송
+        3. HTML 파일을 파싱하여 DOM tree생성, CSS정보를 파싱하여 CSSOM tree 생성, DOM/CSSOM tree 기반 Render tree 생성
+        4. Render tree 기반, Rendering

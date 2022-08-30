@@ -295,5 +295,368 @@
             end
     ```
 
-18. 추가
-    + like '%문자열%' : 뒤의 문자열에서 %의 문자열 기준 %방향으로 어떤 문자든 붙어있는걸 검색 
+18. 자바 앱을 통한 DB 핸들링
+    + DB를 연결하기 위해서는 JDBC 드라이버를 설치 해야함
+        - [여기](https://mariadb.com/kb/en/about-mariadb-connector-j/)에 접속해서 Download MariaDbConnectro/J를 다운
+        - 이후 사용할 프로젝트에 jar 파일을 가져다 둠
+        - 이제 라이브러리를 추가해줘야함
+            1. 파일 -> 프로젝트 구조 -> 라이브러리 탭
+            2. +버튼을 누르고 java선택후 해당 jar파일을 찾아 추가 시키고 적용
+    + DB연결 프로그램 실습
+    ```java
+        package DBTest;
+
+        import java.sql.*;
+
+        public class DBTest {
+            public static void main(String[] args) {
+                //접속 조건
+                //ip, 포트 ,계정 패스워드 인스턴스
+
+                String url = "jdbc:mariadb://13.124.14.252:3306/testdb3";
+                String dbUserId = "testuser3";
+                String dbPassword = "testuser3";
+
+                //1. 드라이버 로드 try-catch문 필수
+                try {
+                    //org.mariadb.jdbc.Driver의 이름을 가진 클래스를 동적으로 로딩한다.
+                    Class.forName("org.mariadb.jdbc.Driver");
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                Connection connection = null;
+
+                //Statement statement = null;  sql Injection 공격에 취약
+                PreparedStatement preparedStatement = null;
+                ResultSet rs = null;
+                String memberTypeValue = "email";
+                try {
+                    //2.커넥션 객체 생성 : 실제 url(jdbc:db종류://ip:포트/db이름) 과        userid와 password를 가지고
+                    //db에 연결함, try-catch문 필수
+                    connection = DriverManager.getConnection(url,dbUserId,dbPassword);
+
+                    //3.스테이트 먼트 객체 생성 : 여기에 쿼리 결과를 받아올 거임
+                    //statement = connection.createStatement();
+
+                    //4. 쿼리 실행 : 쿼리문을 직접 만들어서 날려준다.
+                    //이를 위해서 쿼리작업들이 제대로 작동하는지 DB에서 직접 쿼리를 날려보아        잘 작동하는지 확인 필수
+                    String sql = " select member_type, user_id, password, name " +
+                            " from member " +
+                            " where member_type = ? ";
+
+                    //sql Injection 대응 이것만 쓰면 됨
+                    preparedStatement = connection.prepareStatement(sql);
+                    preparedStatement.setString(1, memberTypeValue);
+
+                    //이게 진짜 쿼리 실행
+                    //rs = statement.executeQuery(sql);
+                    rs = preparedStatement.executeQuery();
+
+                    //5.결과 수행
+                    //resultSet들을 돌면서
+                    while (rs.next()) {
+                        //쿼리를 하나씩 가져온다
+                        String memberType = rs.getString("member_type");
+                        String userID = rs.getString("user_id");
+                        String password = rs.getString("password");
+                        String name = rs.getString("name");
+
+                        System.out.println(memberType + " " + userID + " " + password + "       " + name);
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    //6. 이제 연결을 해제해준다.
+                    try {
+                        if(rs != null && !rs.isClosed()){
+                            rs.close();
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    try {
+                        if(preparedStatement != null && !preparedStatement.isClosed()) {
+                            preparedStatement.close();
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    try {
+                        if(connection != null && !connection.isClosed()) {
+                            connection.close();
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    ```
+    + JDBC Insert 연습
+    ```java
+        public void dbInsert(Member member) {
+        //접속 조건
+        //ip, 포트 ,계정 패스워드 인스턴스
+        String url = "jdbc:mariadb://13.124.14.252:3306/testdb3";
+        String dbUserId = "testuser3";
+        String dbPassword = "testuser3";
+
+        //1. 드라이버 로드 try-catch문 필수
+        try {
+            //org.mariadb.jdbc.Driver의 이름을 가진 클래스를 동적으로 로딩한다.
+            Class.forName("org.mariadb.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+
+        try {
+            //2.커넥션 객체 생성 : 실제 url(jdbc:db종류://ip:포트/db이름) 과 userid와 password를 가지고
+            //db에 연결함, try-catch문 필수
+            connection = DriverManager.getConnection(url,dbUserId,dbPassword);
+
+            
+            //4. 쿼리 실행 : 쿼리문을 직접 만들어서 날려준다.
+            //이를 위해서 쿼리작업들이 제대로 작동하는지 DB에서 직접 쿼리를 날려보아 잘 작동하는지 확인 필수
+            String sql = " insert into member (member_type, user_id, password, name) " +
+                    " values (?, ?, ?, ?); ";
+            
+            //3.스테이트 먼트 객체 생성 : 여기에 쿼리 결과를 받아올 거임
+            //sql Injection 대응 이것만 쓰면 됨
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, member.getMemberType());
+            preparedStatement.setString(2, member.getUserId());
+            preparedStatement.setString(3, member.getPassword());
+            preparedStatement.setString(4, member.getName());
+
+            //이게 진짜 쿼리 실행
+            //쿼리 수행 insert는 영향 받은 행이 나타난다
+            int affected = preparedStatement.executeUpdate();
+
+            //5.결과 수행
+            if(affected > 0) {
+                System.out.println(" 저장 성공 ");
+            } else {
+                System.out.println(" 저장 실패 ");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            //6. 이제 연결을 해제해준다.
+            try {
+                if(rs != null && !rs.isClosed()){
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                if(preparedStatement != null && !preparedStatement.isClosed()) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                if(connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    } 
+    ```
+    + JDBC Update 연습
+    ```java
+        public void dbUpdate() {
+        //접속 조건
+        //ip, 포트 ,계정 패스워드 인스턴스
+        String url = "jdbc:mariadb://13.124.14.252:3306/testdb3";
+        String dbUserId = "testuser3";
+        String dbPassword = "testuser3";
+
+        //1. 드라이버 로드 try-catch문 필수
+        try {
+            //org.mariadb.jdbc.Driver의 이름을 가진 클래스를 동적으로 로딩한다.
+            Class.forName("org.mariadb.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+
+        //내가 넣고 싶은 Value 설정
+        String memberTypeValue = "email";
+        String userIdValue = "zerobase@naver.com";
+        String passwordValue = "9999";
+
+        try {
+            //2.커넥션 객체 생성 : 실제 url(jdbc:db종류://ip:포트/db이름) 과 userid와 password를 가지고
+            //db에 연결함, try-catch문 필수
+            connection = DriverManager.getConnection(url,dbUserId,dbPassword);
+
+
+            //4. 쿼리 실행 : 쿼리문을 직접 만들어서 날려준다.
+            //이를 위해서 쿼리작업들이 제대로 작동하는지 DB에서 직접 쿼리를 날려보아 잘 작동하는지 확인 필수
+            String sql = " update member set " +
+                    " password = ? " +
+                    " where member_type = ? and user_id = ? ";
+
+            //3.스테이트 먼트 객체 생성 : 여기에 쿼리 결과를 받아올 거임
+            //sql Injection 대응 이것만 쓰면 됨
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, passwordValue);
+            preparedStatement.setString(2, memberTypeValue);
+            preparedStatement.setString(3, userIdValue);
+
+            //이게 진짜 쿼리 실행
+            //쿼리 수행 insert는 영향 받은 행이 나타난다
+            int affected = preparedStatement.executeUpdate();
+
+            //5.결과 수행
+            if(affected > 0) {
+                System.out.println(" 수정 성공 ");
+            } else {
+                System.out.println(" 수정 실패 ");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            //6. 이제 연결을 해제해준다.
+            try {
+                if(rs != null && !rs.isClosed()){
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                if(preparedStatement != null && !preparedStatement.isClosed()) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                if(connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    ```
+    + JDBC delete 연습
+    ```java
+        public void dbDelete() {
+        //접속 조건
+        //ip, 포트 ,계정 패스워드 인스턴스
+        String url = "jdbc:mariadb://13.124.14.252:3306/testdb3";
+        String dbUserId = "testuser3";
+        String dbPassword = "testuser3";
+
+        //1. 드라이버 로드 try-catch문 필수
+        try {
+            //org.mariadb.jdbc.Driver의 이름을 가진 클래스를 동적으로 로딩한다.
+            Class.forName("org.mariadb.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
+
+        //내가 넣고 싶은 Value 설정
+        String memberTypeValue = "email";
+        String userIdValue = "zerobase@naver.com";
+        String passwordValue = "9999";
+
+        try {
+            //2.커넥션 객체 생성 : 실제 url(jdbc:db종류://ip:포트/db이름) 과 userid와 password를 가지고
+            //db에 연결함, try-catch문 필수
+            connection = DriverManager.getConnection(url,dbUserId,dbPassword);
+
+
+            //4. 쿼리 실행 : 쿼리문을 직접 만들어서 날려준다.
+            //이를 위해서 쿼리작업들이 제대로 작동하는지 DB에서 직접 쿼리를 날려보아 잘 작동하는지 확인 필수
+            String sql = " delete from member " +
+                    " where member_type = ? and user_id = ? ";
+
+            //3.스테이트 먼트 객체 생성 : 여기에 쿼리 결과를 받아올 거임
+            //sql Injection 대응 이것만 쓰면 됨
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, memberTypeValue);
+            preparedStatement.setString(2, userIdValue);
+
+            //이게 진짜 쿼리 실행
+            //쿼리 수행 insert는 영향 받은 행이 나타난다
+            int affected = preparedStatement.executeUpdate();
+
+            //5.결과 수행
+            if(affected > 0) {
+                System.out.println(" 삭제 성공 ");
+            } else {
+                System.out.println(" 삭제 실패 ");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            //6. 이제 연결을 해제해준다.
+            try {
+                if(rs != null && !rs.isClosed()){
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                if(preparedStatement != null && !preparedStatement.isClosed()) {
+                    preparedStatement.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                if(connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    ```
+    
+19. 데이터 모델링 - 여기 정리 다시 할 것 실습이 많아서....
+    + 업무에서 필요한 부분을 약속한 표기법으로 표시한 갓
+    + 복잡한 현실 세계를 단순화해 표현하는 것
+    + 현실세계를 추상회
+    + 모델링 특징
+        - 추상화 : 현실세계를 일정한 형식에 맞추어 표현. 즉, 다양한 현실을 일정한 양식인 표기법에 따라 표현
+        - 단순화 : 복잡한 현실세계를 약속된 규약에 의해 제한된 표기법이나 언어로 표현하여 쉽게 이해할 수 있도록 하는 개념
+        - 명확화 : 누구나 이해하기 쉽게 이해 하기 위한 대상에 대한 애매 모호함을 제거하고 정확하게 현상을 기술
+
+20. 웹프로그램을 통한 데이터베이스 처리
+        
+25. 추가
+    + like '%문자열%' : 뒤의 문자열에서 %의 문자열 기준 %방향으로 어떤 문자든 붙어있는걸 검색
+    + [SQL Injection 공격](https://noirstar.tistory.com/264) 좀 신박함
+    + Incorrect string value: '\xEC\x84\x9C\xEB\x8C\x80...' for column `wifidb`.`wifi_info`.`` at row 1 
+        - 데이터 베이스 정확하게 입력하고, 한글 데이터가 있을 때 위와 같은 에러가 뜸
+        - ALTER TABLE (테이블명) convert to charset utf8; 명령어로 한글 설정 하면 됨
