@@ -15,8 +15,8 @@
     * 알고리즘
     * [자료구조](./Computer%20Science/Data%20Structure/Data%20Structure.md)
     * [컴퓨터 구조](./Computer%20Science/Computer%20Architecture/Computer%20Architecture.md)
-    * 시스템 소프트웨어
-    * 네트워크 및 통신
+    * [시스템 소프트웨어](./Computer%20Science/System%20Softeware/SystemSoftware.md)
+    * [네트워크 및 통신](./Computer%20Science/Network%20And%20Communication/NetWork.md)
     * [운영 체제](./Computer%20Science/Operating%20System/OperatingSystem.md)
 
 ***
