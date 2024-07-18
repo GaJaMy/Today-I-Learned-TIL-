@@ -170,7 +170,7 @@
     + WWW란
         - W3 또는 웹(Wep)
         - 주요 요소 : HTML,URL,HTTP
-        - HTML을 일거 URL 주소를 가진 곳과 HTTP 프로토콜이용
+        - HTML을 읽어 URL 주소를 가진 곳과 HTTP 프로토콜이용
     + HTTP
         - Server/Client 모델로 Request / Response 사용
             - Client에서 요청(Request)을 보내면, Server에서 응답(Response)을 준다.

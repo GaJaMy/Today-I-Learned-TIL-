@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="http://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div>
+    <h3>회원 가입</h3>
+    <div>
+        <label>아이디</label>
+        <input id="email" type="text">
+    </div>
+    <div>
+        <lable>비밀번호</lable>
+        <input id="password" type="text">
+    </div>
+    <div>
+        <label>닉네임</label>
+        <input id="nickname" type="text">
+    </div>
+    <input type="button" value="회원가입" onclick="signup()">
+</div>
+<div>
+    <h3>로그인</h3>
+    <div>
+        <label>아이디</label>
+        <input id="email-login" type="text">
+    </div>
+    <div>
+        <label>비밀번호</label>
+        <input id="password-login" type="text">
+    </div>
+    <div>
+        <label>accessToken</label>
+        <input id="access-token" type="text" readonly>
+    </div>
+    <input type="button" value="로그인" onclick="login()">
+</div>
+<div>
+    <h3>회원 정보 가져오기</h3>
+    <input type="button" value="회원 정보 가져오기" onclick="getuser()">
+    <div>
+        <label>이메일</label>
+        <input id="email-get-user" type="text" readonly>
+    </div>
+    <div>
+        <label>프로필 URL</label>
+        <input id="profileurl" type="text" readonly>
+    </div>
+    <div>
+        <label>닉네임</label>
+        <input id="nickname-get-user" type="text" readonly>
+    </div>
+    <div>
+        <label>aboutMe</label>
+        <input id="aboutme-get-user" type="text" readonly>
+    </div>
+</div>
+<div>
+    <h3>지역 가져오기</h3>
+    <input type="button" value="지역 가져오기" onclick="getLocal()">
+</div>
+</body>
+<script>
+    function signup() {
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+        var nickname = document.getElementById('nickname').value;
+        var credentials = {
+            email: email,
+            password: password,
+            nickName: nickname
+        };
+
+        axios.post('https://strawberryfarm.shop/auth/signup', credentials)
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    function login() {
+        var email = document.getElementById('email-login').value;
+        var password = document.getElementById('password-login').value;
+        var expired = 600;
+
+        var credentials = {
+            email: email,
+            password: password,
+            expiredTime: expired
+        }
+
+        axios.post('https://strawberryfarm.shop/auth/login', credentials)
+            .then(function (response) {
+                console.log(response);
+                var accessToken = response.data.data.accessToken;
+                localStorage.setItem('accessToken', accessToken);
+                // access 토큰을 입력 필드에 표시합니다.
+                document.getElementById('access-token').value = accessToken;
+                var getAccessToken = localStorage.getItem('accessToken');
+                console.log(getAccessToken);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    function getuser() {
+        axios.get('https://strawberryfarm.shop/user', {
+            withCredentials: true,
+            headers: {
+                'Authorization': 'Bearer :' + localStorage.getItem('accessToken')
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+                document.getElementById('email-get-user').value = response.data.data.email;
+                document.getElementById('profileurl').value = response.data.data.profileUrl;
+                document.getElementById('nickname-get-user').value = response.data.data.nickname;
+                document.getElementById('aboutme-get-user').value = response.data.data.aboutMe;
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    function getLocal() {
+        axios.get('https://strawberryfarm.shop/contents/adminArea')
+        .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+</script>
+</html>

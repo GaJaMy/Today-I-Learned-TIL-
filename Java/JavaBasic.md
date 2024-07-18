@@ -85,10 +85,11 @@
 ***
 6. 클래스와 객체
     + 클래스 - 객체를 정의하는 설계도
-        - 클래스의 객체가 인스턴스화될 때 자동으로 호출되는 특수한 종류의 멤버 함수다.
-        - 생성자 규칙
-            - 클래스명과 이름을 맞춘다
-            - 리턴 타입이 없다.
+        - 생성자
+            - 클래스의 객체가 인스턴스화될 때 자동으로 호출되는 특수한 종류의 멤버 함수다.
+            - 생성자 규칙
+                - 클래스명과 이름을 맞춘다
+                - 리턴 타입이 없다.
     ```Java
         public class className{
             //멤버 변수
@@ -202,7 +203,7 @@
 ***
 11. 내부 클래스
     + 내부 클래스 - 클래스 안에 선언한 클래스
-        - 내부 클래스에서 외브 클래스 멤법 접근 가능
+        - 내부 클래스에서 외부 클래스 멤법 접근 가능
         - 외부에서는 내부 클래스에 접근 불가
         - 종류
             1. 인스턴스 클래스 -
@@ -215,7 +216,7 @@
             public abstract void printInfo();
         }
         
-        class Student extends Perse{
+        class Student extends Person{
             public void printInfo(){
                 System.out.println("Student.printInfo");
             }
