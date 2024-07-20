@@ -47,3 +47,9 @@
     ```
 
     + Spring에서 DynamoDB 연동하기(Config 설정)
+    ```java
+    @Configuration
+    public class DyanmodbConfiguration() {
+        
+    }
+    ```
