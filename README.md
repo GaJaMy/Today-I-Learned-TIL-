@@ -8,7 +8,7 @@
     * [JavaScript](./%EA%B8%B0%EC%B4%88%20HTML%2CCSS%2CJavaScript/JavaScript/JavaScript.md)
 3. Java
     * [자바 설치 및 환경 설정](./Java/JavaSetting.md)
-    * [자바 기초](./Java/Java.md)
+    * [자바 기초](./Java/JavaBasic.md)
 4. MFC
 5. C#
 6. Computer Science
