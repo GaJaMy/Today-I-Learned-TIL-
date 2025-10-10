@@ -57,3 +57,46 @@ public class GlobalExceptionHandler {
         
     }
 ```
+
+## 엔티티 작성시 ENUM 다루기
+
+1. DB 중심 설계
+```java
+    @Column(columnDefinition = "ENUM('싱글', '연애 중', '기혼')")
+    private String relationshipStatus;
+```
+- DB의 ENUM 타입을 직접 사용하고 명시한 것이다.
+- 검증 책임이 DB 자체에 있다.
+- ENUM 값이 바뀌게 되면 DB DLL 자체를 수정해야한다.
+- 확장성이 떨어진다.
+
+2. 도메인 중심 설계
+```java
+    // enum 선언
+    @AllArgsConstructor
+    @Getter
+    public enum RelrationShipStatus {
+        SIGLE("싱글"),
+        DATING("연애 중"),
+        MARRIED("기혼");
+    
+        private final String code;
+    }
+
+    // 컨버터 정의
+    @Converter(autoApply = true)
+    public class RelrationShipStatusConverter extends BaseEnumConverter<RelrationShipStatus> {
+        public RelrationShipStatusConverter() {
+            super(RelrationShipStatus.class);
+        }
+    }
+
+    // 엔티티에서 사용
+    @Convert(converter = RelrationShipStatusConverter.class) 
+    @Column(nullable = false) 
+    private RelrationShipStatus relrationShipStatus;
+```
+- 자바의 enum 타입 사용
+- 자바 코드 에서 타입 안정성이 보장된다.(자바에 검증 책임이 있다.)
+- Enum 수정만 회면 된다 DB는 그냥 vachar로 된다.
+- 확장성이 크다.
