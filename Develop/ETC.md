@@ -1,5 +1,24 @@
 # 실개발 시 알게된 것들
 
+
+## 공통 처리
+## 응답 처리
+```java
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class ResponseDto<T> {
+        @Schema(description = "에러 코드", example = "SU000")
+        private String errorCode;
+        @Schema(description = "응답 메시지", example = "ok")
+        private String msg;
+        @Setter
+        @Schema(description = "응답 데이터")
+        private T data;
+    }
+```
+
 ## 에러 처리
 - ControllerAdvice를 통해 글로벌 에러를 처리할 때, 어떤 Exception에서 어떤 에러를 처리하는지 정리
 ```java
@@ -98,7 +117,7 @@ public class GlobalExceptionHandler {
 ```
 - 자바의 enum 타입 사용
 - 자바 코드 에서 타입 안정성이 보장된다.(자바에 검증 책임이 있다.)
-- Enum 수정만 회면 된다 DB는 그냥 vachar로 된다.
+- Enum 수정만 하면 된다 DB는 그냥 varchar로 된다.
 - 확장성이 크다.
 
 ## 이벤트 처리
@@ -142,6 +161,3 @@ public class GlobalExceptionHandler {
         }
     }
 ```
-
-## build.gradle
-
