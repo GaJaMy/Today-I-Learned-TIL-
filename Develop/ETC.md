@@ -246,177 +246,114 @@ public class GlobalExceptionHandler {
     ```
 
 6. Spy, Partial Mocking
+    - @Spy 또는 spy(new RealObj())
+    - 일부 메서드만 mocking하고 나머지는 실제 동작 사용
+
+- 예:
+    ```java
+        MyService spy = spy(new MyService(realRepo));
+        doReturn(5).when(spy).compute(anyInt());
+    ```
+
+7. Mockito 어노테이션들
+    - @Mock — mock 생성
+    - @Spy — spy 생성
+    - @InjectMocks — mock을 대상 객체에 주입
+    - @Captor — ArgumentCaptor 생성
+    - @ExtendWith(MockitoExtension.class) — JUnit5 통합
+
+
+
+8. 언제 뭘 써야 하는가 (권장 패턴)
+    - 외부 의존성(DB, repo, REST client 등) → @Mock + when(...).thenReturn(...) 로 동작 고정.
+    - void 메서드에서 예외를 발생시키려면 doThrow(...) 사용.
+    - spy로 실제 구현을 사용하려면 doReturn(...) 방식으로 안전하게 스텁.
+    - 반환값의 동작이 입력 인자에 따라 달라진다면 thenAnswer(invocation -> { ... }) 사용.
+    - 행위 검증(부수 효과 검사)이 목적이면 verify(...) 사용.
+    - 결과값(assertion) 중심이면 assertEquals/AssertJ로 상태 검증.
+
+
+
+9. 실전 예제 모아보기
+    ```java
+        @ExtendWith(MockitoExtension.class)
+        class ExampleTest {
+            @Mock
+            Repo repo;
+
+            @InjectMocks
+            MyService service;
+
+            @Captor
+            ArgumentCaptor<User> userCaptor;
+
+            @Test
+            void stubbing_example() {
+                User u = new User("id", "name");
+                when(repo.findById("id")).thenReturn(Optional.of(u));
+
+                User result = service.getUser("id");
+                assertEquals("name", result.getName());
+                verify(repo, times(1)).findById("id");
+            }
+
+            @Test
+            void void_and_doThrow_example() {
+                doThrow(new RuntimeException("fail")).when(repo).delete("bad-id");
+                assertThrows(RuntimeException.class, () -> service.deleteUser("bad-id"));
+                verify(repo).delete("bad-id");
+            }
+
+            @Test
+            void spy_example() {
+                MyService real = new MyService(repo);
+                MyService spy = spy(real);
+                doReturn(99).when(spy).calculate(anyInt());
+
+                int v = spy.calculate(1);
+                assertEquals(99, v);
+            }
+
+            @Test
+            void answer_example() {
+                when(repo.save(any(User.class))).thenAnswer(inv -> {
+                    User arg = inv.getArgument(0);
+                    arg.setId("generatedId");
+                    return arg;
+                });
+
+                User u = new User(null, "name");
+                User saved = service.register(u);
+                assertNotNull(saved.getId());
+            }
+
+            @Test
+            void captor_example() {
+                User u = new User("id","n");
+                service.register(u);
+                verify(repo).save(userCaptor.capture());
+                assertEquals("n", userCaptor.getValue().getName());
+            }
+        }
+
+    ```
+
+10. 흔한 실수 & 팁
+    - Spy + when(...) 사용하면 실제 메서드가 실행될 수 있음 → doReturn 권장.
+    - ArgumentMatchers와 실제 값 혼용 시 타입 불일치 에러 발생 → eq()와 조합하거나 모든 인자에 매처 사용.
+    - verifyNoMoreInteractions()는 디버깅엔 유용하지만 유지보수에서 불편함을 줄 수 있으니 신중하게.
+    - 여러 번 when(...).thenReturn(...) 하면 마지막 설정이 유효. 복수 호출 상황은 thenReturn(a, b, c) 사용 가능.
+    - 불필요한 reset(mock)은 피하라 — 테스트를 이해하기 어렵게 만듦.
+
+
+11. 간단한 요약(치트시트)
+    - 값 반환 스터빙: when(...).thenReturn(...)
+    - 예외 스터빙: when(...).thenThrow(...) / doThrow(...).when(...)(void)
+    - 동적 응답: thenAnswer(...)
+    - spy 안전 스터빙: doReturn(...).when(spy)...
+    - 행위 검증: verify(mock) + times(), never(), inOrder(...)
+    - 인자 매칭: any(), anyString(), eq(...)
+    - 인자 캡처: ArgumentCaptor
+    - BDD 스타일: given(...).willReturn(...)
 
 
-@Spy 또는 spy(new RealObj())
-
-
-일부 메서드만 mocking하고 나머지는 실제 동작 사용
-
-
-예:
-MyService spy = spy(new MyService(realRepo));
-doReturn(5).when(spy).compute(anyInt());
-
-
-G. 정적 메서드 / final / 생성자 mocking (고급)
-
-
-mockStatic(SomeClass.class) (Mockito-inline 또는 Mockito 3.4+ 필요)
-
-
-mockConstruction 등도 존재 (라이프사이클 제어)
-
-
-
-H. Mockito 어노테이션들
-
-
-@Mock — mock 생성
-
-
-@Spy — spy 생성
-
-
-@InjectMocks — mock을 대상 객체에 주입
-
-
-@Captor — ArgumentCaptor 생성
-
-
-@ExtendWith(MockitoExtension.class) — JUnit5 통합
-
-
-
-3) 언제 뭘 써야 하는가 (권장 패턴)
-
-
-외부 의존성(DB, repo, REST client 등) → @Mock + when(...).thenReturn(...) 로 동작 고정.
-
-
-void 메서드에서 예외를 발생시키려면 doThrow(...) 사용.
-
-
-spy로 실제 구현을 사용하려면 doReturn(...) 방식으로 안전하게 스텁.
-
-
-반환값의 동작이 입력 인자에 따라 달라진다면 thenAnswer(invocation -> { ... }) 사용.
-
-
-행위 검증(부수 효과 검사)이 목적이면 verify(...) 사용.
-
-
-결과값(assertion) 중심이면 assertEquals/AssertJ로 상태 검증.
-
-
-
-4) 실전 예제 모아보기
-@ExtendWith(MockitoExtension.class)
-class ExampleTest {
-    @Mock
-    Repo repo;
-
-    @InjectMocks
-    MyService service;
-
-    @Captor
-    ArgumentCaptor<User> userCaptor;
-
-    @Test
-    void stubbing_example() {
-        User u = new User("id", "name");
-        when(repo.findById("id")).thenReturn(Optional.of(u));
-
-        User result = service.getUser("id");
-        assertEquals("name", result.getName());
-        verify(repo, times(1)).findById("id");
-    }
-
-    @Test
-    void void_and_doThrow_example() {
-        doThrow(new RuntimeException("fail")).when(repo).delete("bad-id");
-        assertThrows(RuntimeException.class, () -> service.deleteUser("bad-id"));
-        verify(repo).delete("bad-id");
-    }
-
-    @Test
-    void spy_example() {
-        MyService real = new MyService(repo);
-        MyService spy = spy(real);
-        doReturn(99).when(spy).calculate(anyInt());
-
-        int v = spy.calculate(1);
-        assertEquals(99, v);
-    }
-
-    @Test
-    void answer_example() {
-        when(repo.save(any(User.class))).thenAnswer(inv -> {
-            User arg = inv.getArgument(0);
-            arg.setId("generatedId");
-            return arg;
-        });
-
-        User u = new User(null, "name");
-        User saved = service.register(u);
-        assertNotNull(saved.getId());
-    }
-
-    @Test
-    void captor_example() {
-        User u = new User("id","n");
-        service.register(u);
-        verify(repo).save(userCaptor.capture());
-        assertEquals("n", userCaptor.getValue().getName());
-    }
-}
-
-
-5) 흔한 실수 & 팁
-
-
-Spy + when(...) 사용하면 실제 메서드가 실행될 수 있음 → doReturn 권장.
-
-
-ArgumentMatchers와 실제 값 혼용 시 타입 불일치 에러 발생 → eq()와 조합하거나 모든 인자에 매처 사용.
-
-
-verifyNoMoreInteractions()는 디버깅엔 유용하지만 유지보수에서 불편함을 줄 수 있으니 신중하게.
-
-
-여러 번 when(...).thenReturn(...) 하면 마지막 설정이 유효. 복수 호출 상황은 thenReturn(a, b, c) 사용 가능.
-
-
-불필요한 reset(mock)은 피하라 — 테스트를 이해하기 어렵게 만듦.
-
-
-
-6) 간단한 요약(치트시트)
-
-
-값 반환 스터빙: when(...).thenReturn(...)
-
-
-예외 스터빙: when(...).thenThrow(...) / doThrow(...).when(...)(void)
-
-
-동적 응답: thenAnswer(...)
-
-
-spy 안전 스터빙: doReturn(...).when(spy)...
-
-
-행위 검증: verify(mock) + times(), never(), inOrder(...)
-
-
-인자 매칭: any(), anyString(), eq(...)
-
-
-인자 캡처: ArgumentCaptor
-
-
-BDD 스타일: given(...).willReturn(...)
-
-
-
-필요하면, 지금 TokenService 테스트나 UserService 테스트에 위 패턴을 적용해서 구체적인 테스트 코드(예: doThrow로 void 예외 스텁, thenAnswer로 동적 값 반환, ArgumentCaptor로 내부 DTO 검증 등)를 바로 만들어 드릴게요. 어느 메서드/시나리오에 적용해볼까요?
