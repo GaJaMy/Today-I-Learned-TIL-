@@ -357,3 +357,189 @@ public class GlobalExceptionHandler {
     - BDD 스타일: given(...).willReturn(...)
 
 
+# Slice 기반 무한 스크롤 가이드
+
+## 1. Slice란?
+
+**Slice는 Spring Data JPA에서 제공하는 페이징 인터페이스로, 무한 스크롤에 최적화된 방식입니다.**
+
+전체 개수(COUNT)를 조회하지 않고 "다음 페이지가 있는지"만 확인하여 성능을 개선합니다.
+
+---
+
+## 2. Page vs Slice 차이점
+
+### Page (일반 페이지네이션)
+
+**제공하는 정보:**
+- 전체 데이터 개수 (`getTotalElements()`)
+- 전체 페이지 수 (`getTotalPages()`)
+- 현재 페이지 번호 (`getNumber()`)
+- 다음 페이지 존재 여부 (`hasNext()`)
+- 데이터 목록 (`getContent()`)
+
+**실행되는 SQL (2개):**
+```sql
+-- 1. 데이터 조회
+SELECT * FROM chat_history WHERE chat_room_id = ? LIMIT 20 OFFSET 0;
+
+-- 2. 전체 개수 조회 (추가 쿼리!)
+SELECT COUNT(*) FROM chat_history WHERE chat_room_id = ?;
+```
+
+---
+
+### Slice (무한 스크롤 최적화)
+
+**제공하는 정보:**
+- ❌ 전체 데이터 개수 (없음)
+- ❌ 전체 페이지 수 (없음)
+- ✅ 현재 페이지 번호 (`getNumber()`)
+- ✅ 다음 페이지 존재 여부 (`hasNext()`)
+- ✅ 데이터 목록 (`getContent()`)
+
+**실행되는 SQL (1개만!):**
+```sql
+-- 21개 조회 (20개 요청 + 1개는 hasNext 판단용)
+SELECT * FROM chat_history WHERE chat_room_id = ? LIMIT 21 OFFSET 0;
+```
+
+---
+
+## 3. Slice 동작 원리
+
+### 핵심 메커니즘
+
+클라이언트가 20개를 요청하면, **실제로는 21개를 조회**합니다.
+
+```java
+// 클라이언트 요청: 20개
+Pageable pageable = PageRequest.of(0, 20);
+
+// 서버 내부: 21개 조회 (size + 1)
+Slice<ChatHistory> slice = repository.findByRoomUuid("uuid", pageable);
+```
+
+**Spring Data JPA 동작:**
+1. 요청한 크기 + 1개를 조회 (`LIMIT 21`)
+2. 21개가 조회되면 → `hasNext() = true` (더 있음)
+3. 20개 이하만 조회되면 → `hasNext() = false` (마지막)
+4. 클라이언트에게는 **20개만 반환**
+
+**예시:**
+```java
+// Case 1: 21개 조회됨 (더 데이터가 있음)
+slice.getContent().size();  // 20개 (마지막 1개는 제외하고 반환)
+slice.hasNext();            // true
+
+// Case 2: 15개만 조회됨 (마지막 페이지)
+slice.getContent().size();  // 15개
+slice.hasNext();            // false
+```
+
+---
+
+## 4. 클라이언트와의 상호작용 시나리오
+
+### 전체 흐름
+
+```
+[1단계] 사용자가 채팅방 입장
+    ↓
+[클라이언트] GET /api/histories?page=0&size=20
+    ↓
+[서버] SQL: LIMIT 21 실행 → 21개 조회됨
+    ↓
+[서버] { content: [20개], hasNext: true } 응답
+    ↓
+[클라이언트] 첫 20개 메시지 화면에 표시
+
+========================================
+
+[2단계] 사용자가 스크롤을 아래로 내림 (끝까지 도달)
+    ↓
+[클라이언트] GET /api/histories?page=1&size=20
+    ↓
+[서버] SQL: LIMIT 21 OFFSET 20 실행 → 21개 조회됨
+    ↓
+[서버] { content: [20개], hasNext: true } 응답
+    ↓
+[클라이언트] 기존 20개 + 새로운 20개 = 총 40개 표시
+
+========================================
+
+[3단계] 사용자가 또 스크롤 내림
+    ↓
+[클라이언트] GET /api/histories?page=2&size=20
+    ↓
+[서버] SQL: LIMIT 21 OFFSET 40 실행 → 15개만 조회됨
+    ↓
+[서버] { content: [15개], hasNext: false } 응답
+    ↓
+[클라이언트] 총 55개 표시 + "모든 메시지 로드 완료" 표시
+```
+
+### 핵심 포인트
+
+**무한 스크롤은 한 번에 모든 데이터를 받는 것이 아닙니다!**
+
+- 클라이언트가 **필요할 때마다** 서버에 요청
+- 매 요청마다 **일정 개수씩만** 받아옴 (예: 20개)
+- `hasNext`가 `false`가 될 때까지 반복
+- 클라이언트는 받은 데이터를 **누적**해서 화면에 표시
+
+---
+
+## 5. 성능 비교
+
+### 예시: 총 500개의 데이터를 모두 로드하는 경우
+
+| 방식 | 요청 횟수 | 총 쿼리 수 | 쿼리 내용 |
+|------|----------|-----------|----------|
+| **Page** | 25번 | **50번** | SELECT(25번) + COUNT(25번) |
+| **Slice** | 25번 | **25번** | SELECT(25번) only |
+
+**결과: Slice가 2배 빠름!** (COUNT 쿼리가 없기 때문)
+
+---
+
+## 6. 언제 사용해야 하는가?
+
+### Page 사용 (일반 페이지네이션)
+
+**적합한 경우:**
+- 페이지 번호가 있는 UI (1, 2, 3, ... 페이지)
+- "전체 N개" 같은 정보 표시 필요
+- "1/10 페이지" 같은 진행률 표시 필요
+
+**예시:**
+- 게시판
+- 검색 결과
+- 관리자 페이지
+
+---
+
+### Slice 사용 (무한 스크롤)
+
+**적합한 경우:**
+- 스크롤 방식 UI
+- 전체 개수가 불필요
+- 모바일 앱 피드
+- 성능이 중요한 경우
+
+**예시:**
+- SNS 피드 (Instagram, Twitter, Facebook)
+- 채팅 내역
+- 무한 스크롤 리스트
+
+---
+
+### 동작 방식
+- **한 번에 모든 데이터를 가져오지 않음**
+- **클라이언트가 스크롤할 때마다 서버에 요청**
+- **서버는 size+1개를 조회하여 hasNext 판단**
+- **성능은 Page보다 2배 빠름** (COUNT 쿼리 없음)
+
+
+
+
