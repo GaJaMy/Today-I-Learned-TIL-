@@ -542,4 +542,5 @@ slice.hasNext();            // false
 
 
 
-
+## 외래키 제약 조건 없이 연ㄱ
+https://jangjeonghun.tistory.com/1203#google_vignette
