@@ -544,3 +544,18 @@ slice.hasNext();            // false
 
 ## 외래키 제약 조건 없이 연ㄱ
 https://jangjeonghun.tistory.com/1203#google_vignette
+
+외래키 제약조건 없이 연관관계 설정
+- 외래키 제약 조건을 없애, 성능 향상과 테이블 조작, 마이그레이션을 용이
+- lock 처리시 데드락을 방지 할 수 있다. 
+- 만약 jpa 단이 아닌 db 자체에서 외래키 제약 조건이 걸려 있다면, 아래의 설정을 해도 의미가 없다.
+
+
+```java
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "chat_analysis_id",
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
+    private ChatAnalysis chatAnalysis;
+```
