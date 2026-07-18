@@ -21,16 +21,161 @@
 - npm 패키지가 제공하는 실행 프로그램을 직접 실행하는 도구입니다.
 - npm이 패키지를 설치하고 관리한다면, npx는 패키지의 명령어를 실행
 
-## Componet와 Element
-- 간단히 Component는 설계도 element는 제품과 같다.
-- class와 instance 관계와 비슷
-- Component를 사용함으로서 재사용성이 올라간다.
-    - 반드시 의존성이 없이 독립적이어야 한다.
+## Component와 Element
 
 ### Component
-- 정의: 엘리먼트를 생성하고 UI를 재사용 가능한 개별 조각으로 나누는 독립적인 코드 블록
-- 특징: 속성(props)을 인자로 받아 리액트 엘리먼트를 반환(return)하는 함수나 클래스로 작성
+
+- 화면의 구조와 동작을 정의하는 **설계도**
+- UI를 재사용 가능한 단위로 나눈 코드 블록
+- 일반적으로 `props`를 전달받아 React Element를 반환한다.
+- 같은 Component를 여러 번 사용해도 각각 독립적으로 렌더링된다.
+
+```jsx
+function Greeting({ name }) {
+  return <h1>안녕하세요, {name}님</h1>;
+}
+```
+
+### State
+
+- Component가 렌더링 사이에도 기억해야 하는 **현재 데이터**
+- 값이 변경됐을 때 화면도 함께 변경되어야 하는 경우 사용한다.
+- React 내부에서 관리되며, 렌더 트리의 특정 Component와 연결된다.
+
+State로 관리하는 값의 예시는 다음과 같다.
+
+- 현재 숫자
+- 입력창의 값
+- 메뉴 열림 여부
+- 로그인 여부
+
+함수형 Component에서는 `useState` Hook으로 State를 관리한다.
+
+```jsx
+import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      현재 숫자: {count}
+    </button>
+  );
+}
+```
+
+```jsx
+const [count, setCount] = useState(0);
+```
+
+- `count`: 현재 State 값
+- `setCount`: State 변경 함수
+- `0`: 최초 렌더링에서 사용할 초기값
+
+```text
+setCount 호출
+    ↓
+State 변경
+    ↓
+Component 다시 실행
+    ↓
+새로운 Element 생성
+    ↓
+화면 업데이트
+```
+
+React가 일반 변수의 변화를 자동으로 감지하는 것은 아니다.
+
+`setCount`와 같은 State 변경 함수를 호출해야 React가 Component를 다시 렌더링한다.
+
+### Hook
+
+- 함수형 Component에서 React의 기능을 사용할 수 있게 해주는 함수
+- 일반적으로 이름이 `use`로 시작한다.
+
+```text
+useState   : 상태 관리
+useEffect  : 렌더링 이후 작업
+useRef     : 값 또는 DOM 참조 보관
+useContext : Context 값 사용
+```
+
+`useState`는 함수형 Component에서 State를 사용할 수 있게 해주는 Hook이다.
 
 ### Element
-- 정의: 화면에 나타날 내용을 기술하는 가장 작은 단위의 불변(Immutable) 자바스크립트 객체
-- 특징: 생성된 후에는 객체의 속성이나 자식을 변경할 수 없으며, 영화의 필름(프레임)처럼 특정 시점의 UI 상태를 그대로 담고 있슴
+
+- 특정 시점에 화면이 어떤 모습이어야 하는지 설명하는 **불변 JavaScript 객체**
+- Component가 실행된 결과로 생성된다.
+- 실제 브라우저 DOM 객체와는 다르다.
+
+```jsx
+const element = <h1>안녕하세요</h1>;
+```
+
+위 JSX는 개념적으로 다음과 같은 객체를 생성한다.
+
+```javascript
+{
+  type: "h1",
+  props: {
+    children: "안녕하세요"
+  }
+}
+```
+
+React는 Element를 해석해 실제 DOM에 반영한다.
+
+```text
+Component 실행
+    ↓
+React Element 생성
+    ↓
+React가 Element 해석
+    ↓
+DOM에 반영
+    ↓
+브라우저 화면
+```
+
+Element는 생성된 후 직접 수정하지 않는다.
+
+State가 변경되면 Component가 다시 실행되고 새로운 Element가 생성된다.
+
+## 전체 관계
+
+```text
+Component
+= 화면의 구조와 동작을 정의하는 설계도
+
+State
+= Component가 기억해야 하는 현재 데이터
+
+Hook
+= 함수형 Component에서 State 등의 기능을 사용하게 해주는 함수
+
+Element
+= 특정 시점의 화면 모습을 설명하는 불변 객체
+
+DOM Element
+= 브라우저에 실제로 표시되는 객체
+```
+
+```text
+Component 실행
+    ↓
+현재 State를 이용해 Element 생성
+    ↓
+React가 DOM에 반영
+    ↓
+사용자 동작
+    ↓
+State 변경 함수 호출
+    ↓
+Component 재실행
+    ↓
+새로운 Element 생성
+    ↓
+화면 업데이트
+```
+
