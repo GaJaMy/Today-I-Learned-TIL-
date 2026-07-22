@@ -576,6 +576,7 @@
       - spring-boot-starter-test에 기본적으로 Junit5 포함됨
 
 ## 스프링 생태계
+```
 Spring Ecosystem
 │
 ├── Spring Framework (코어)
@@ -604,3 +605,28 @@ Spring Ecosystem
      ├─ Spring Session
      ├─ Spring for GraphQL
      └─ Spring Shell 등
+```
+
+
+## 간단 정리
+| 용어                       | 정의                                     | 핵심 역할                                               |
+| ------------------------ | -------------------------------------- | --------------------------------------------------- |
+| **Spring Boot**          | Spring 애플리케이션을 쉽게 설정하고 실행하게 해주는 프레임워크  | 자동 설정, 내장 서버 실행, Spring Bean 구성                     |
+| **Tomcat**               | Java의 대표적인 서블릿 컨테이너                    | HTTP 요청 수신, 서블릿 선택·실행, 서블릿 생명주기 관리                  |
+| **Servlet**              | Java에서 HTTP 요청과 응답을 처리하기 위한 표준 규격      | 요청을 받아 처리하고 응답을 생성                                  |
+| **Servlet Container**    | 서블릿을 실행하고 관리하는 환경                      | 서블릿 생성·초기화·호출·소멸 관리. Tomcat이 대표적                    |
+| **DispatcherServlet**    | Spring MVC의 중심이 되는 서블릿                 | 요청을 받아 적절한 Controller에 전달하고 응답 처리                   |
+| **Spring MVC**           | Spring에서 웹 요청과 응답을 처리하는 구조             | DispatcherServlet, Controller, HandlerMapping 등을 제공 |
+| **Controller**           | 개발자가 작성하는 웹 요청 처리 객체                   | 요청 데이터 수신, Service 호출, 결과 반환                        |
+| **Handler**              | 실제 요청을 처리하는 대상                         | 일반적으로 Controller의 특정 메서드를 의미                        |
+| **HandlerMapping**       | 요청을 처리할 Handler를 찾는 객체                 | URL과 HTTP 메서드를 기준으로 Controller 메서드 검색               |
+| **HandlerAdapter**       | 찾은 Handler를 실제로 실행하는 객체                | 다양한 형태의 Controller 메서드를 공통 방식으로 호출                  |
+| **HttpMessageConverter** | Java 객체와 HTTP 본문을 변환하는 객체              | Java 객체를 JSON으로, JSON을 Java 객체로 변환                  |
+| **ViewResolver**         | Controller가 반환한 View 이름으로 실제 화면을 찾는 객체 | `"users"` 같은 이름을 JSP, Thymeleaf 파일과 연결              |
+| **Filter**               | 서블릿 실행 전후에 동작하는 웹 표준 기능                | 인증, 로깅, 인코딩 등 공통 처리                                 |
+| **Interceptor**          | Controller 실행 전후에 동작하는 Spring MVC 기능   | 로그인 확인, 권한 검사, 실행 시간 측정 등                           |
+| **Service**              | 비즈니스 로직을 처리하는 계층                       | 업무 규칙 처리, 여러 Repository 작업 조합                       |
+| **Repository**           | 데이터 접근을 담당하는 계층                        | 데이터베이스 조회·저장·수정·삭제                                  |
+| **Spring Bean**          | Spring 컨테이너가 생성하고 관리하는 객체              | Controller, Service, Repository 등의 객체 관리            |
+| **Spring Container**     | Spring Bean을 생성하고 연결하는 환경              | 의존성 주입과 객체 생명주기 관리                                  |
+
